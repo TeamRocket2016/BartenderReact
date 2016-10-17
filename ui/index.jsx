@@ -13,8 +13,14 @@ injectTapEventPlugin();
 const MainWrapper = ({ children }) => (
   <MuiThemeProvider>
     <div>
-      <AppBar />
-      <div className="container">
+      <AppBar
+        title='Cognitive Bartender'
+        showMenuIconButton={false}
+      />
+      <div
+        className="container"
+        style={{ marginTop: '1em' }}
+      >
         {children}
       </div>
     </div>
@@ -26,7 +32,9 @@ MainWrapper.propTypes = {
 };
 
 const LandingPage = () => (
-  <Paper>Hello World</Paper>
+  <Paper style={{ padding: '1em' }}>
+    Hello World
+  </Paper>
 );
 
 // Inject React into HTML DOM
