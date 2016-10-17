@@ -11,7 +11,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "webpack-dev-server -d --hot --inline --no-info --port 8081",
-    "lint": "eslint ./**/*.jsx"
+    "lint": "eslint ./**/*.jsx",
+    "compile": "webpack",
+    "deploy": "gh-pages -d output"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
@@ -25,6 +27,7 @@
     "eslint-plugin-import": "^2.0.1",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.4.1",
+    "gh-pages": "^0.11.0",
     "html-webpack-plugin": "^2.22.0",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.2"
