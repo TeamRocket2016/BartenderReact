@@ -1,0 +1,7 @@
+.message-bubble-appear {
+  opacity: 0;
+}
+.message-bubble-appear ..message-bubble-appear-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}

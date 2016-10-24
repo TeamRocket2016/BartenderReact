@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import $ from 'jquery';
 import {
   Paper,
@@ -31,9 +32,17 @@ const messageLeftStyle = {
 };
 
 const MessageBubble = ({ messageStyle, messageBody }) => (
-  <Paper style={messageStyle}>
-    <span>{messageBody}</span>
-  </Paper>
+  <ReactCSSTransitionGroup
+    transitionName="message-bubble"
+    transitionEnterTimeout={0}
+    transitionLeaveTimeout={0}
+    transitionAppear={true}
+    transitionAppearTimeout={500}
+    >
+    <Paper style={messageStyle}>
+      <span>{messageBody}</span>
+    </Paper>
+  </ReactCSSTransitionGroup>
 );
 
 function Message(type, body) {
@@ -63,6 +72,10 @@ class ChatBox extends React.Component {
     } else {
       this.setState({ inputText: value });
     }
+  }
+
+  componentDidUpdate(){
+    window.scrollTo(0, document.body.scrollHeight);
   }
 
   render() {
@@ -135,8 +148,9 @@ class ChatStateContainer extends React.Component {
     this._messageEndpoint = `${endpoint}/newMessage`;
   }
   addMessage(message) {
+    const messages = this.state.messages.concat([message]);
     this.setState({
-      messages: this.state.messages.concat([message]),
+      messages: messages,
     });
   }
   receiveReply(reply) {

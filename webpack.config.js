@@ -3,7 +3,10 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './ui/index.jsx',
+  entry: [
+    './ui/index.jsx',
+    './ui/index.css'
+  ],
   output: {
     publicPath: '/',
     path: path.join(__dirname, '/output'),
@@ -17,6 +20,10 @@ module.exports = {
         loader: 'babel',
         exclude: /node_modules/,
       },
+      {
+        test: /\.css$/,
+        loader: 'style!css'
+      }
     ],
   },
   plugins: [
