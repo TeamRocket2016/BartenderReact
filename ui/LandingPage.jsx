@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDom from 'react-dom';
 import $ from 'jquery';
 import {
   Paper,
@@ -93,21 +94,23 @@ class ChatBox extends React.Component {
     return (
       <div>
         <WatsonLogo />
-        {this.props.messages.map((message, index) => {
-          const style = (function getStyle() {
-            if (message.type === 'remote') {
-              return messageLeftStyle;
-            }
-            return messageRightStyle;
-          }());
-          return (
-            <MessageBubble
-              key={index}
-              messageStyle={style}
-              messageBody={message.body}
-            />
-          );
-        })}
+        <div style={{ paddingBottom: '120px', overflow: 'hidden' }}>
+          {this.props.messages.map((message, index) => {
+            const style = (function getStyle() {
+              if (message.type === 'remote') {
+                return messageLeftStyle;
+              }
+              return messageRightStyle;
+            }());
+            return (
+              <MessageBubble
+                key={index}
+                messageStyle={style}
+                messageBody={message.body}
+              />
+            );
+          })}
+        </div>
         {textBar}
       </div>
     );
@@ -149,7 +152,7 @@ class ChatStateContainer extends React.Component {
       success: this.receiveReply,
     })
     .fail((error) => {
-      alert(`Failed to send message: ${JSON.stringify(error)}`);
+      window.alert(`Failed to send message: ${JSON.stringify(error)}`);
     });
     const sentMessage = new Message('local', message);
     this.addMessage(sentMessage);
