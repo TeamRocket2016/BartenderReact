@@ -13,8 +13,8 @@ const WatsonLogo = () => (
     <img
       style={{
         margin: '0 auto',
-        maxWidth: '100%',
-        maxHeight: '100%',
+        width: '100%',
+        height: '100%',
       }}
       role="presentation"
       src="http://www.ibm.com/cognitive/uk-en/outthink/i/outthink/logo.gif"
