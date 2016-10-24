@@ -1,4 +1,5 @@
 import React from 'react';
+import $ from 'jquery';
 import {
   Paper,
   Toolbar,
@@ -64,6 +65,10 @@ class ChatBox extends React.Component {
   }
 
   render() {
+    if (!this.props.messages) {
+      return null;
+    }
+    const lastMessage = this.props.messages[this.props.messages.length - 1];
     const textBar = (
       <Toolbar
         style={{
@@ -76,6 +81,7 @@ class ChatBox extends React.Component {
         }}
       >
         <TextField
+          disabled={lastMessage.type === 'local'}
           onChange={this.handleTextInput}
           onKeyDown={this.handleTextInput}
           value={this.state.inputText}
@@ -87,7 +93,7 @@ class ChatBox extends React.Component {
     return (
       <div>
         <WatsonLogo />
-        {this.props.messages.map((message) => {
+        {this.props.messages.map((message, index) => {
           const style = (function getStyle() {
             if (message.type === 'remote') {
               return messageLeftStyle;
@@ -96,6 +102,7 @@ class ChatBox extends React.Component {
           }());
           return (
             <MessageBubble
+              key={index}
               messageStyle={style}
               messageBody={message.body}
             />
@@ -112,15 +119,41 @@ class ChatStateContainer extends React.Component {
     super(props);
     this.state = {
       messages: [
-        new Message('remote', 'Hello User!'),
-        new Message('local', 'Hello Watson!'),
+        new Message('remote', 'Hello User! 🍻'),
       ],
     };
     this.sendMessage = this.sendMessage.bind(this);
+    this.receiveReply = this.receiveReply.bind(this);
+    this.addMessage = this.addMessage.bind(this);
+
+    const sessionId = Math.floor(Math.random() * 10000000);
+    const endpoint = `/api/${sessionId}`;
+    this._speechEndpoint = `${endpoint}/speechToText`;
+    this._messageEndpoint = `${endpoint}/newMessage`;
+  }
+  addMessage(message) {
+    this.setState({
+      messages: this.state.messages.concat([message]),
+    });
+  }
+  receiveReply(reply) {
+    const replyMessage = new Message('remote', reply.messageBody);
+    this.addMessage(replyMessage);
   }
   sendMessage(message) {
-    // TODO
-    console.log('TODO: send message', message);
+    $.ajax({
+      type: 'POST',
+      url: this._messageEndpoint,
+      data: { messageBody: message },
+      dataType: 'json',
+      success: this.receiveReply,
+    })
+    .fail((error) => {
+      alert(`Failed to send message: ${JSON.stringify(error)}`);
+    });
+    console.log('TODO: send message', message, $);
+    const sentMessage = new Message('local', message);
+    this.addMessage(sentMessage);
   }
 
   render() {
