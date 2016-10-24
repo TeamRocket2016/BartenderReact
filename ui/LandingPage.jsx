@@ -12,53 +12,12 @@ const defaultPaperStyle = {
   margin: '1em',
 };
 
-class TextBar extends React.Component{
-  constructor(props){
-    super(props);
-    this.state = {textValue: ''};
-  }
-
-  handleKeyPress = (event)=> {
-    const value = event.target.value;
-    console.log('event', event);
-    if(event.key == 'Enter'){
-      this.props.inputHandler(value);
-      this.setState({textValue: ''});
-    } else {
-      console.log(value);
-      this.setState({textValue: value});
-    }
-  }
-
-  render() {
-    return (
-      <Toolbar
-        style ={{
-          right: '1em',
-          left: '1em',
-          position: 'fixed',
-          bottom: 0,
-          maxWidth: '100%',
-          backgroundColor: 'rgb(48,48,48)'
-        }}
-      >
-        <TextField
-          onChange={this.handleKeyPress}
-          onKeyDown={this.handleKeyPress}
-          value={this.state.textValue}
-          style={{ width: '100%' }}
-          hintText="Enter Message" />
-      </Toolbar>
-    );
-  }
-}
-
 const messageRightStyle = {
   padding: defaultPaperStyle.padding,
   margin: defaultPaperStyle.margin,
   float: 'right',
   width: '50%',
-  textAlign: 'right'
+  textAlign: 'right',
 };
 
 const messageLeftStyle = {
@@ -66,28 +25,76 @@ const messageLeftStyle = {
   margin: defaultPaperStyle.margin,
   float: 'left',
   width: '50%',
-  textAlign: 'left'
+  textAlign: 'left',
 };
 
-const Message = ({messageStyle, messageBody}) => (
+const MessageBubble = ({ messageStyle, messageBody }) => (
   <Paper style={messageStyle}>
     <span>{messageBody}</span>
   </Paper>
 );
 
+
+class ChatBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputText: '',
+    };
+    // Bind component to function
+    this.handleTextInput = this.handleTextInput.bind(this);
+  }
+
+  handleTextInput(event) {
+    const value = event.target.value;
+    if (event.key === 'Enter') {
+      console.log('TODO: send text message', value);
+      this.setState({ inputText: '' });
+    } else {
+      this.setState({ inputText: value });
+    }
+  }
+
+  render() {
+    const textBar = (
+      <Toolbar
+        style={{
+          right: '1em',
+          left: '1em',
+          position: 'fixed',
+          bottom: 0,
+          maxWidth: '100%',
+          backgroundColor: 'rgb(48,48,48)',
+        }}
+      >
+        <TextField
+          onChange={this.handleTextInput}
+          onKeyDown={this.handleTextInput}
+          value={this.state.inputText}
+          style={{ width: '100%' }}
+          hintText="Enter Message"
+        />
+      </Toolbar>
+    );
+    return (
+      <div>
+        <WatsonLogo />
+        <MessageBubble
+          messageStyle={messageLeftStyle}
+          messageBody="hello user"
+        />
+        <MessageBubble
+          messageStyle={messageRightStyle}
+          messageBody="hello watson"
+        />
+        {textBar}
+      </div>
+    );
+  }
+}
+
 const LandingPage = () => (
-  <div>
-    <WatsonLogo />
-      <Message
-        messageStyle={messageLeftStyle}
-        messageBody="hello user" />
-    <Message
-      messageStyle={messageRightStyle}
-      messageBody="hello watson" />
-    <TextBar
-      inputHandler={(textMessage)=>console.log('evt', textMessage)}
-    />
-  </div>
+  <ChatBox />
 );
 
 export default LandingPage;

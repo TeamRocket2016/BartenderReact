@@ -11,7 +11,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "start": "webpack-dev-server -d --hot --inline --no-info --port 8081",
-    "lint": "eslint ./**/*.jsx",
+    "lint": "eslint --fix ./**/*.jsx",
     "compile": "webpack",
     "deploy": "gh-pages -d output"
   },
