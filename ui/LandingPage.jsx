@@ -34,6 +34,14 @@ const MessageBubble = ({ messageStyle, messageBody }) => (
   </Paper>
 );
 
+function Message(type, body) {
+  this.type = type;
+  this.body = body;
+
+  if (this.type !== 'remote' && this.type !== 'local') {
+    throw 'Unknown Message Type Set';
+  }
+}
 
 class ChatBox extends React.Component {
   constructor(props) {
@@ -48,7 +56,7 @@ class ChatBox extends React.Component {
   handleTextInput(event) {
     const value = event.target.value;
     if (event.key === 'Enter') {
-      console.log('TODO: send text message', value);
+      this.props.sendMessage(value);
       this.setState({ inputText: '' });
     } else {
       this.setState({ inputText: value });
@@ -79,22 +87,54 @@ class ChatBox extends React.Component {
     return (
       <div>
         <WatsonLogo />
-        <MessageBubble
-          messageStyle={messageLeftStyle}
-          messageBody="hello user"
-        />
-        <MessageBubble
-          messageStyle={messageRightStyle}
-          messageBody="hello watson"
-        />
+        {this.props.messages.map((message) => {
+          const style = (function getStyle() {
+            if (message.type === 'remote') {
+              return messageLeftStyle;
+            }
+            return messageRightStyle;
+          }());
+          return (
+            <MessageBubble
+              messageStyle={style}
+              messageBody={message.body}
+            />
+          );
+        })}
         {textBar}
       </div>
     );
   }
 }
 
+class ChatStateContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      messages: [
+        new Message('remote', 'Hello User!'),
+        new Message('local', 'Hello Watson!'),
+      ],
+    };
+    this.sendMessage = this.sendMessage.bind(this);
+  }
+  sendMessage(message) {
+    // TODO
+    console.log('TODO: send message', message);
+  }
+
+  render() {
+    return (
+      <ChatBox
+        messages={this.state.messages}
+        sendMessage={this.sendMessage}
+      />
+    );
+  }
+}
+
 const LandingPage = () => (
-  <ChatBox />
+  <ChatStateContainer />
 );
 
 export default LandingPage;
