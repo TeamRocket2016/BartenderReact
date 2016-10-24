@@ -151,7 +151,6 @@ class ChatStateContainer extends React.Component {
     .fail((error) => {
       alert(`Failed to send message: ${JSON.stringify(error)}`);
     });
-    console.log('TODO: send message', message, $);
     const sentMessage = new Message('local', message);
     this.addMessage(sentMessage);
   }
