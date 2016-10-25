@@ -88,13 +88,17 @@ class AudioRecorder extends React.Component {
   }
 
   componentDidMount() {
-    const getUserMedia = navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
+    navigator.getUserMedia = navigator.webkitGetUserMedia ||
       navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia;
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((localMediaStream) => {
+      navigator.msGetUserMedia ||
+      navigator.getUserMedia;
+    if(!navigator.getUserMedia){
+      return;
+    }
+    new Promise((resolve, reject)=>{
+      navigator.getUserMedia({ audio: true },
+        (stream)=> resolve(stream), (error) => reject(error))
+    }).then((localMediaStream) => {
         const audioRecorder = new MediaRecorder(localMediaStream);
         audioRecorder.ondataavailable = this.addAudioChunk;
         this.setState({
