@@ -9,6 +9,7 @@ import {
   Toolbar,
   TextField,
 } from 'material-ui';
+import { red500, blue500 } from 'material-ui/styles/colors';
 
 import WatsonLogo from './WatsonLogo.jsx';
 
@@ -38,9 +39,9 @@ const MessageBubble = ({ messageStyle, messageBody }) => (
     transitionName="message-bubble"
     transitionEnterTimeout={0}
     transitionLeaveTimeout={0}
-    transitionAppear={true}
+    transitionAppear
     transitionAppearTimeout={500}
-    >
+  >
     <Paper style={messageStyle}>
       <span>{messageBody}</span>
     </Paper>
@@ -59,30 +60,30 @@ function Message(type, body) {
 class AudioRecorder extends React.Component {
   constructor(props) {
     super(props);
-    //PROPS: saveRecording: callback, allowRecording: boolean
-    this.state = {audioRecorder: null, chunks: []};
+    // PROPS: saveRecording: callback, allowRecording: boolean
+    this.state = { audioRecorder: null, chunks: [] };
     this.toggleRecording = this.toggleRecording.bind(this);
     this.addAudioChunk = this.addAudioChunk.bind(this);
     this.compileAudioChunks = this.compileAudioChunks.bind(this);
   }
 
-  addAudioChunk(event){
+  addAudioChunk(event) {
     console.log('Saving chunks', event);
     this.setState({
-      chunks: this.state.chunks.concat([event.data])
+      chunks: this.state.chunks.concat([event.data]),
     });
-    if(this.state.audioRecorder.state === 'inactive'){
+    if (this.state.audioRecorder.state === 'inactive') {
       this.compileAudioChunks();
     }
   }
 
-  compileAudioChunks(){
+  compileAudioChunks() {
     const chunks = this.state.chunks;
-    if(chunks.length < 1){
+    if (chunks.length < 1) {
       console.error('No Audio chunks to save');
       return;
     }
-    const audioBlob = new Blob(chunks, {type: 'audio/ogg;codecs=opus'});
+    const audioBlob = new Blob(chunks, { type: 'audio/ogg;codecs=opus' });
     this.props.saveRecording(audioBlob);
   }
 
@@ -92,21 +93,21 @@ class AudioRecorder extends React.Component {
       navigator.mozGetUserMedia ||
       navigator.msGetUserMedia;
     navigator.mediaDevices
-      .getUserMedia({audio: true})
-      .then((localMediaStream)=>{
+      .getUserMedia({ audio: true })
+      .then((localMediaStream) => {
         const audioRecorder = new MediaRecorder(localMediaStream);
         audioRecorder.ondataavailable = this.addAudioChunk;
         this.setState({
-          audioRecorder: audioRecorder
+          audioRecorder,
         });
       });
   }
 
   toggleRecording(event) {
     const recorder = this.state.audioRecorder;
-    if(recorder.state === 'inactive'){
+    if (recorder.state === 'inactive') {
       console.log('Starting recording');
-      this.setState({chunks:[]});
+      this.setState({ chunks: [] });
       recorder.start();
       return;
     }
@@ -115,18 +116,30 @@ class AudioRecorder extends React.Component {
 
   render() {
     const that = this;
-    const mediaAvailable = (function(){
-      if(that.state.audioRecorder){
+    const mediaAvailable = (() => {
+      if (that.state.audioRecorder) {
         return true;
       }
       return false;
     })();
     const disableRecording = !mediaAvailable || !this.props.allowRecording;
+    const color = (() => {
+      if (mediaAvailable && that.state.audioRecorder.state !== 'inactive') {
+        return red500;
+      }
+      return blue500;
+    })();
     return (
       <IconButton
         onTouchTap={this.toggleRecording}
-        disabled={disableRecording}>
-        <FontIcon className="material-icons">record_voice_over</FontIcon>
+        disabled={disableRecording}
+      >
+        <FontIcon
+          color={color}
+          className="material-icons"
+        >
+          record_voice_over
+        </FontIcon>
       </IconButton>
     );
   }
@@ -152,7 +165,7 @@ class ChatBox extends React.Component {
     }
   }
 
-  componentDidUpdate(){
+  componentDidUpdate() {
     window.scrollTo(0, document.body.scrollHeight);
   }
 
@@ -219,7 +232,7 @@ class ChatStateContainer extends React.Component {
       messages: [
         new Message('remote', 'Hello User! 🍻'),
       ],
-      allowRecording: true
+      allowRecording: true,
     };
     this.sendMessage = this.sendMessage.bind(this);
     this.receiveReply = this.receiveReply.bind(this);
@@ -234,7 +247,7 @@ class ChatStateContainer extends React.Component {
   addMessage(message) {
     const messages = this.state.messages.concat([message]);
     this.setState({
-      messages: messages,
+      messages,
     });
   }
   receiveReply(reply) {
@@ -256,12 +269,42 @@ class ChatStateContainer extends React.Component {
     this.addMessage(sentMessage);
   }
 
-  saveRecording(audioBlob){
+  saveRecording(audioBlob) {
     this.setState({
-      allowRecording: false
+      allowRecording: false,
     });
-    console.log('TODO: POST audio blob', audioBlob);
-    //TODO: post audio blob, get reply, send message, enable recording
+    const sendPromise = (() => {
+      return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open('POST', this._speechEndpoint, true);
+        request.addEventListener('load', (event) => {
+          resolve(request.response);
+        });
+        request.addEventListener('error', (event) => {
+          reject(event);
+        });
+        request.addEventListener('abort', (event) => {
+          reject(event);
+        });
+        request.send(audioBlob);
+      });
+    })();
+
+    let allowRecording = () => {
+      this.setState({ allowRecording: true });
+    };
+    allowRecording = allowRecording.bind(this);
+
+    sendPromise
+    .then((transcript) => {
+      console.log('Transcript', transcript);
+      allowRecording();
+      this.sendMessage(transcript);
+    })
+    .catch((error) => {
+      alert(JSON.stringify(error));
+      allowRecording();
+    });
   }
 
   render() {
