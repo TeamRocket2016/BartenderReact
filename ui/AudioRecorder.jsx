@@ -2,7 +2,8 @@ import React from 'react';
 import {
   FontIcon,
   IconButton } from 'material-ui';
-import { red500, blue500 } from 'material-ui/styles/colors';
+const blue40 = 'rgb(85, 150, 230)';
+const red40 = 'rgb(255, 80, 80)';
 
 class AudioRecorder extends React.Component {
   constructor(props) {
@@ -12,26 +13,6 @@ class AudioRecorder extends React.Component {
     this.toggleRecording = this.toggleRecording.bind(this);
     this.addAudioChunk = this.addAudioChunk.bind(this);
     this.compileAudioChunks = this.compileAudioChunks.bind(this);
-  }
-
-  addAudioChunk(event) {
-    console.log('Saving chunks', event);
-    this.setState({
-      chunks: this.state.chunks.concat([event.data]),
-    });
-    if (this.state.audioRecorder.state === 'inactive') {
-      this.compileAudioChunks();
-    }
-  }
-
-  compileAudioChunks() {
-    const chunks = this.state.chunks;
-    if (chunks.length < 1) {
-      console.error('No Audio chunks to save');
-      return;
-    }
-    const audioBlob = new Blob(chunks, { type: 'audio/ogg;codecs=opus' });
-    this.props.saveRecording(audioBlob);
   }
 
   componentDidMount() {
@@ -52,6 +33,26 @@ class AudioRecorder extends React.Component {
         audioRecorder,
       });
     });
+  }
+
+  addAudioChunk(event) {
+    console.log('Saving chunks', event);
+    this.setState({
+      chunks: this.state.chunks.concat([event.data]),
+    });
+    if (this.state.audioRecorder.state === 'inactive') {
+      this.compileAudioChunks();
+    }
+  }
+
+  compileAudioChunks() {
+    const chunks = this.state.chunks;
+    if (chunks.length < 1) {
+      console.error('No Audio chunks to save');
+      return;
+    }
+    const audioBlob = new Blob(chunks, { type: 'audio/ogg;codecs=opus' });
+    this.props.saveRecording(audioBlob);
   }
 
   toggleRecording(event) {
@@ -76,9 +77,9 @@ class AudioRecorder extends React.Component {
     const disableRecording = !mediaAvailable || !this.props.allowRecording;
     const color = (() => {
       if (mediaAvailable && that.state.audioRecorder.state !== 'inactive') {
-        return red500;
+        return red40;
       }
-      return blue500;
+      return blue40;
     })();
     return (
       <IconButton

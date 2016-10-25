@@ -1,3 +1,8 @@
+@font-face {
+  font-family: MIB;
+  src: url('MIB.ttf');
+}
+
 .message-bubble-appear {
   opacity: 0;
 }

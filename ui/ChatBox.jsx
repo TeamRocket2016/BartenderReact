@@ -56,6 +56,10 @@ class ChatBox extends React.Component {
     this.handleTextInput = this.handleTextInput.bind(this);
   }
 
+  componentDidUpdate() {
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+
   handleTextInput(event) {
     const value = event.target.value;
     if (event.key === 'Enter') {
@@ -64,10 +68,6 @@ class ChatBox extends React.Component {
     } else {
       this.setState({ inputText: value });
     }
-  }
-
-  componentDidUpdate() {
-    window.scrollTo(0, document.body.scrollHeight);
   }
 
   render() {

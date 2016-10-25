@@ -5,7 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: [
     './ui/index.jsx',
-    './ui/index.css'
+    './ui/index.css',
+    './ui/MIB.ttf',
   ],
   output: {
     publicPath: '/',
@@ -23,6 +24,10 @@ module.exports = {
       {
         test: /\.css$/,
         loader: 'style!css'
+      },
+      {
+        test: /\.ttf$/,
+        loader: 'file?name=[name].[ext]'
       }
     ],
   },
