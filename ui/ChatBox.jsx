@@ -1,13 +1,10 @@
 import React from 'react';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import {
-  FontIcon,
-  IconButton,
   Paper,
   Toolbar,
   TextField,
 } from 'material-ui';
-import Message from './Message.jsx';
 import WatsonLogo from './WatsonLogo.jsx';
 import AudioRecorder from './AudioRecorder.jsx';
 

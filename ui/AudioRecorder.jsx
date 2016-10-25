@@ -2,6 +2,7 @@ import React from 'react';
 import {
   FontIcon,
   IconButton } from 'material-ui';
+
 const blue40 = 'rgb(85, 150, 230)';
 const red40 = 'rgb(255, 80, 80)';
 
@@ -36,7 +37,6 @@ class AudioRecorder extends React.Component {
   }
 
   addAudioChunk(event) {
-    console.log('Saving chunks', event);
     this.setState({
       chunks: this.state.chunks.concat([event.data]),
     });
@@ -55,10 +55,9 @@ class AudioRecorder extends React.Component {
     this.props.saveRecording(audioBlob);
   }
 
-  toggleRecording(event) {
+  toggleRecording() {
     const recorder = this.state.audioRecorder;
     if (recorder.state === 'inactive') {
-      console.log('Starting recording');
       this.setState({ chunks: [] });
       recorder.start();
       return;

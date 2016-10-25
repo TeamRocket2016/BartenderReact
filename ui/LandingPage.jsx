@@ -1,12 +1,5 @@
 import React from 'react';
 import $ from 'jquery';
-import {
-  FontIcon,
-  IconButton,
-  Paper,
-  Toolbar,
-  TextField,
-} from 'material-ui';
 
 import ChatBox from './ChatBox.jsx';
 import Message from './Message.jsx';
@@ -24,10 +17,12 @@ class ChatStateContainer extends React.Component {
     this.receiveReply = this.receiveReply.bind(this);
     this.addMessage = this.addMessage.bind(this);
     this.saveRecording = this.saveRecording.bind(this);
+    this.getSpeech = this.getSpeech.bind(this);
 
     const sessionId = Math.floor(Math.random() * 10000000);
     const endpoint = `/api/${sessionId}`;
     this._speechEndpoint = `${endpoint}/speechToText`;
+    this._textToSpeechEndpoint = `${endpoint}/textToSpeech`;
     this._messageEndpoint = `${endpoint}/newMessage`;
   }
   addMessage(message) {
@@ -36,9 +31,43 @@ class ChatStateContainer extends React.Component {
       messages,
     });
   }
+
+  getSpeech(message) {
+    new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.open('POST', this._textToSpeechEndpoint, true);
+      request.setRequestHeader('Content-Type', 'application/json');
+      request.addEventListener('load', (event) => {
+        resolve(request.response);
+      });
+      request.addEventListener('error', (event) => {
+        reject(event);
+      });
+      request.send(JSON.stringify({ messageBody: message.body }));
+    })
+    .then((response) => {
+      /* const audioBlob = new Blob([response], {type: 'audio/ogg;codecs=opus'});
+      const audio = new Audio();
+      const a = document.createElement('a');
+      audio.src = window.URL.createObjectURL(audioBlob);
+      return window.location.assign(audio.src);//TODO
+      a.href = audio.src;
+      a.download = 'audio.ogg';
+      audio.play();
+      a.click();*/
+      const audio = new Audio();
+      audio.src = response;
+      audio.play();
+    })
+    .catch((error) => {
+      console.error('Audio decode error', error);
+    });
+  }
+
   receiveReply(reply) {
     const replyMessage = new Message('remote', reply.messageBody);
     this.addMessage(replyMessage);
+    this.getSpeech(replyMessage);
   }
   sendMessage(message) {
     $.ajax({
